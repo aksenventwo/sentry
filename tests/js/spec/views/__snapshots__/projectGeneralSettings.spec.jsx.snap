@@ -433,14 +433,16 @@ exports[`projectGeneralSettings renders 1`] = `
               priority="danger"
               title="Remove project?"
             >
-              <Button
-                className="ref-remove-project"
-                disabled={false}
-                priority="danger"
-                type="button"
-              >
-                Remove Project
-              </Button>
+              <div>
+                <Button
+                  className="ref-remove-project"
+                  disabled={false}
+                  priority="danger"
+                  type="button"
+                >
+                  Remove Project
+                </Button>
+              </div>
             </Confirm>
           </Field>
         </div>
@@ -487,14 +489,16 @@ exports[`projectGeneralSettings renders 1`] = `
               renderMessage={[Function]}
               title="Transfer project?"
             >
-              <Button
-                className="ref-transfer-project"
-                disabled={false}
-                priority="danger"
-                type="button"
-              >
-                Transfer Project
-              </Button>
+              <div>
+                <Button
+                  className="ref-transfer-project"
+                  disabled={false}
+                  priority="danger"
+                  type="button"
+                >
+                  Transfer Project
+                </Button>
+              </div>
             </Confirm>
           </Field>
         </div>

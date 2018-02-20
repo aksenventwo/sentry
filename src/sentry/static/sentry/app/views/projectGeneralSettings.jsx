@@ -159,9 +159,11 @@ export default class ProjectGeneralSettings extends AsyncView {
               </div>
             }
           >
-            <Button className="ref-remove-project" type="button" priority="danger">
-              {t('Remove Project')}
-            </Button>
+            <div>
+              <Button className="ref-remove-project" type="button" priority="danger">
+                {t('Remove Project')}
+              </Button>
+            </div>
           </Confirm>
         </Field>
       );
@@ -238,9 +240,11 @@ export default class ProjectGeneralSettings extends AsyncView {
               </div>
             )}
           >
-            <Button className="ref-transfer-project" type="button" priority="danger">
-              {t('Transfer Project')}
-            </Button>
+            <div>
+              <Button className="ref-transfer-project" type="button" priority="danger">
+                {t('Transfer Project')}
+              </Button>
+            </div>
           </Confirm>
         </Field>
       );
