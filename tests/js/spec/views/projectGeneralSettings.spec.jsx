@@ -83,8 +83,8 @@ describe('projectGeneralSettings', function() {
 
   it('project admins can transfer project', function() {
     let deleteMock = Client.addMockResponse({
-      url: `/projects/${org.slug}/${project.slug}/`,
-      method: 'DELETE',
+      url: `/projects/${org.slug}/${project.slug}/transfer/`,
+      method: 'POST',
     });
 
     let component = mount(
@@ -110,11 +110,11 @@ describe('projectGeneralSettings', function() {
     component.find('Modal Button[priority="danger"]').simulate('click');
 
     expect(deleteMock).toHaveBeenCalledWith(
-      `/projects/${org.slug}/${project.slug}/`,
+      `/projects/${org.slug}/${project.slug}/transfer/`,
       expect.objectContaining({
-        method: 'DELETE',
+        method: 'POST',
         data: {
-          transfer: 'billy@sentry.io',
+          email: 'billy@sentry.io',
         },
       })
     );
