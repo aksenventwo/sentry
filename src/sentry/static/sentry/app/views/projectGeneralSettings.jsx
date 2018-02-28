@@ -123,15 +123,17 @@ export default class ProjectGeneralSettings extends AsyncView {
 
     if (!isProjectAdmin) {
       return (
-        <p>{t('You do not have the required permission to remove this project.')}</p>
+        <Field inline={false}>
+          {t('You do not have the required permission to remove this project.')}
+        </Field>
       );
     } else if (project.isInternal) {
       return (
-        <p>
+        <Field inline={false}>
           {t(
             'This project cannot be removed. It is used internally by the Sentry server.'
           )}
-        </p>
+        </Field>
       );
     } else {
       return (
@@ -178,15 +180,17 @@ export default class ProjectGeneralSettings extends AsyncView {
 
     if (!isProjectAdmin) {
       return (
-        <p>{t('You do not have the required permission to transfer this project.')}</p>
+        <Field inline={false}>
+          {t('You do not have the required permission to transfer this project.')}
+        </Field>
       );
     } else if (project.isInternal) {
       return (
-        <p>
+        <Field inline={false}>
           {t(
             'This project cannot be removed. It is used internally by the Sentry server.'
           )}
-        </p>
+        </Field>
       );
     } else {
       return (
