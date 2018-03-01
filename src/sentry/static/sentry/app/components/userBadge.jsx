@@ -9,7 +9,7 @@ const UserBadge = ({user, orgId}) => {
       <Avatar user={user} size={80} />
       <h5>
         <Link to={`/settings/organization/${orgId}/members/${user.id}`}>
-          {user.email}
+          {user.name || user.email}
         </Link>
       </h5>
       {user.email}
