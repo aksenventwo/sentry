@@ -5,8 +5,10 @@ import styled from 'react-emotion';
 import ApiMixin from '../../../mixins/apiMixin';
 import UserBadge from '../../../components/userBadge';
 import Button from '../../../components/buttons/button';
+import DropdownAutoComplete from '../../../components/dropdownAutoComplete';
+import DropdownButton from '../../../components/dropdownButton';
 import IndicatorStore from '../../../stores/indicatorStore';
-import {leaveTeam} from '../../../actionCreators/teams';
+import {joinTeam, leaveTeam} from '../../../actionCreators/teams';
 import LoadingError from '../../../components/loadingError';
 import LoadingIndicator from '../../../components/loadingIndicator';
 import OrganizationState from '../../../mixins/organizationState';
@@ -29,7 +31,8 @@ const TeamMembers = createReactClass({
     return {
       loading: true,
       error: false,
-      memberList: null,
+      teamMemberList: null,
+      orgMemberList: null,
     };
   },
 
@@ -65,7 +68,7 @@ const TeamMembers = createReactClass({
       {
         success: () => {
           this.setState({
-            memberList: this.state.memberList.filter(m => {
+            teamMemberList: this.state.teamMemberList.filter(m => {
               return m.id !== member.id;
             }),
           });
@@ -90,7 +93,7 @@ const TeamMembers = createReactClass({
     this.api.request(`/teams/${params.orgId}/${params.teamId}/members/`, {
       success: data => {
         this.setState({
-          memberList: data,
+          teamMemberList: data,
           loading: false,
           error: false,
         });
@@ -102,25 +105,90 @@ const TeamMembers = createReactClass({
         });
       },
     });
+
+    this.api.request(`/organizations/${params.orgId}/members/`, {
+      success: data => {
+        this.setState({
+          orgMemberList: data,
+        });
+      },
+      error: () => {
+        IndicatorStore.add(t('Unable to load organization members.'), 'error', {
+          duration: 2000,
+        });
+      },
+    });
   },
 
-  addMemberButton(access, orgId) {
-    return access.has('org:write') ? (
-      <Button
-        priority="primary"
-        size="small"
-        className="pull-right"
-        to={`/settings/organization/${orgId}/members/new/`}
-      >
-        <span className="icon-plus" /> {t('Invite Member')}
-      </Button>
-    ) : (
-      <a
-        className="btn btn-primary btn-sm btn-disabled tip pull-right"
-        title={t('You do not have enough permission to add new members')}
-      >
-        <span className="icon-plus" /> {t('Invite Member')}
-      </a>
+  addTeamMember(selection) {
+    let params = this.props.params;
+
+    this.setState({
+      loading: true,
+    });
+
+    joinTeam(
+      this.api,
+      {
+        orgId: params.orgId,
+        teamId: params.teamId,
+        memberId: selection.value,
+      },
+      {
+        success: () => {
+          let orgMember = this.state.orgMemberList.find(member => {
+            return member.id === selection.value;
+          });
+          this.setState({
+            loading: false,
+            error: false,
+            teamMemberList: this.state.teamMemberList.concat([orgMember]),
+          });
+          IndicatorStore.add(t('Successfully added member to team.'), 'success', {
+            duration: 2000,
+          });
+        },
+        error: () => {
+          this.setState({
+            loading: false,
+          });
+          IndicatorStore.add(t('Unable to add team member.'), 'error', {duration: 2000});
+        },
+      }
+    );
+  },
+
+  renderDropdown(access) {
+    if (!access.has('org:write')) {
+      return (
+        <a
+          className="btn btn-default btn-disabled tip pull-right"
+          title={t('You do not have enough permission to add new members')}
+        >
+          <span className="icon-plus" /> {t('Add Member')}
+        </a>
+      );
+    }
+
+    let existingMembers = new Set(this.state.teamMemberList.map(member => member.id));
+    let items = [];
+    (this.state.orgMemberList || []).forEach(member => {
+      if (!existingMembers.has(member.id)) {
+        items.push({
+          value: member.id,
+          label: member.name || member.email,
+        });
+      }
+    });
+
+    return (
+      <DropdownAutoComplete items={items} onSelect={this.addTeamMember}>
+        {({isOpen, selectedItem}) => (
+          <DropdownButton isOpen={isOpen}>
+            <span className="icon-plus" /> {t('Add Member')}
+          </DropdownButton>
+        )}
+      </DropdownAutoComplete>
     );
   },
 
@@ -138,12 +206,12 @@ const TeamMembers = createReactClass({
           <PanelHeader>
             <PanelHeaderContentContainer>
               <div>{t('Members')}</div>
-              {this.addMemberButton(access, params.orgId)}
+              <div style={{textTransform: 'none'}}>{this.renderDropdown(access)}</div>
             </PanelHeaderContentContainer>
           </PanelHeader>
           <table className="table member-list">
             <tbody>
-              {this.state.memberList.map((member, i) => {
+              {this.state.teamMemberList.map((member, i) => {
                 return (
                   <tr key={i}>
                     <td className="table-user-info">
